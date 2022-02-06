@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators  import login_required
 from myinsta.forms import *
-from django.urls import reverse
+
 
 # Create your views here.
 @login_required(login_url='/accounts/login/')
@@ -83,13 +83,24 @@ def search(request):
     else:
         message = "You haven't searched for any user"
         return render(request, 'search.html',{"message1":message})
+  
 
-@login_required
-def PostLike(request, pk):
-    post = get_object_or_404(Post, id=request.POST.get('post_id'))
-    if post.likes.filter(id=request.user.id).exists():
-        post.likes.remove(request.user)
-    else:
-        post.likes.add(request.user)
+def like_post(request):
+    user = request.user
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        post_photo =Post.objects.get(id=post_id)
+        if user in post_photo.liked.all():
+            post_photo.liked.add(user)
+        else:
+            post_photo.liked.add(user)    
+            
+        like,created =Like.objects.get_or_create(user=user, post_id=post_id)
+        if not created:
+            if like.value =='Like':
+               like.value = 'Unlike'
+        else:
+               like.value = 'Like'
 
-    return HttpResponseRedirect(reverse('/', args=[str(pk)]))        
+        like.save()       
+    return redirect('index')
