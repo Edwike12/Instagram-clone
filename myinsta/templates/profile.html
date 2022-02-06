@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="container profile">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card text-left">
+                {% if profile.profile_photo %}
+                <img src="{{user.profile.profile_photo.url}}" alt="" style="border-radius: 50%; width: 50%; height: auto;">
+                {%else%}
+                <img src="https://st2.depositphotos.com/1104517/11965/v/600/depositphotos_119659092-stock-illustration-male-avatar-profile-picture-vector.jpg"
+                    class="card-img-top" alt="My profile picture">
+                {% endif %}
+                <div class="card-body">
+                    <p>Name: {{ profile.name }}</p>
+                    <p>Username: {{ user.username }}</p>
+
+                    <p>
+                        {% if profile.bio %}
+                        <small>Bio: {{ profile.bio }}</small>
+                        {% else %}
+                        <span class="text-danger">No about me</span>
+                        {% endif %}
+                    </p>
+
+                    <p>Phone_number: {{ profile.phone_number }}</p>
+                    <p>Email: {{ profile.email }}</p>
+                    <h6>Joined on: <span class="badge rounded-pill bg-secondary text-white">
+                            {{ user.date_joined|date }} </span></h6>
+
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <div class="row">
+                    <div class="col-md-6 details">
+                        <div class="first">
+                            <div>
+                                <a href="{%url 'update_profile' user.id %}"
+                                    class="btn btn-outline-dark bg-dark text-white rounded-pill">
+                                    Edit Profile
+                                </a>
+                            </div>
+                        </div>
+                       
+                    </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+
+{% endblock %}
