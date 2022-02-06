@@ -21,6 +21,26 @@
     <p>{{ post.photo_name }}</p>
     <p>{{ post.photo_caption}}</p>
     <p>{{ post.posted_at|timesince }} ago </p>
+    <form action="{% url 'like_post' %}" method='POST'>
+        {% csrf_token %}
+        <input type="hidden" name="post_id" value="{{photo.id}}">
+        {%if user not in photo.liked.all %}
+        <button class="btn-light" type="submit" style="border: none; margin-right: 63%;"><i
+                class="far fa-heart text-dark"></i>
+            <i class="fa fa-comment" aria-hidden="true"></i>
+        </button>
+
+        {% else %}
+        <button class="btn-light" type="submit" style="border: none; margin-right: 63%;"><i
+                class="far fa-heart text-danger"></i>
+            <i class="fa fa-comment" aria-hidden="true"></i>
+        </button>
+
+        {% endif %}
+
+
+    </form>
+    <strong style=" margin-right: 60%;">{{photo.liked.all.count}}likes</strong>
     <div>
         <p>COMMENTS:</p>
         {% for comment in post.saved_comments %}
@@ -59,6 +79,7 @@
     </div>
 
 </div>
+
 
 
 {% endblock %}
