@@ -11,7 +11,7 @@ class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     bio=models.TextField(null=True, max_length=1000)
     email=models.CharField(null=True, max_length=50)
-    phone_number=models.IntegerField(max_length=20)
+    phone_number=models.IntegerField(null=True)
 
     @receiver(post_save , sender = User)
     def create_profile(instance,sender,created,**kwargs):
@@ -21,6 +21,9 @@ class Profile(models.Model):
     @receiver(post_save,sender = User)
     def save_profile(sender,instance,**kwargs):
       instance.profile.save()
+
+      def __str__(self):
+        return f'{self.user.username} profile'
 
 class Post(models.Model):
     image = CloudinaryField('image')
@@ -56,8 +59,18 @@ class Post(models.Model):
     def saved_comments(self):
         return self.comments.all()
     
-    def _str_(self):
-     return "%s photo" % self.photo_name      
+    def __str__(self):
+     return "%s photo" % self.photo_name 
+
+class Comment(models.Model):
+    comment = models.CharField(max_length=250,null=True)
+    post = models.ForeignKey(Post,on_delete = models.CASCADE,related_name='comments',null=True)
+    user = models.ForeignKey(User,on_delete = models.CASCADE,related_name='comments',null=True)
+
+    @classmethod
+    def display_comment(cls,post_id):
+        comments = cls.objects.filter(post_id = post_id)
+        return comments        
 
 
 
