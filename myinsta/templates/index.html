@@ -5,29 +5,60 @@
 
 {% block content %}
 
-         
+
 {{block.super}}
-<h1>BE OPTIMISTIC THIS IS JUST THE BEGINING</h1>
+<br><br><br>
+<div class="container">
+    {% for post in posts %}
+    {% if user.is_authenticated %}
+    <a href="/profile"><img src="{{user.profile.profile_photo.url}}" alt="" style="border-radius: 50%; width: 30px; height: 30px;"></a>
+    <span class="text-white">{{user.username|title}}</span>
+    {% else %}
+    <img src="https://st2.depositphotos.com/1104517/11965/v/600/depositphotos_119659092-stock-illustration-male-avatar-profile-picture-vector.jpg"
+        class="card-img-top" alt="My profile picture" style="border-radius: 50%; width: 50%; height: auto;">
+    {% endif %} </a> <a href="/profile" class="upro">{{user.profile.user}} </a><br>
+    <img src="{{post.image.url}}" width="200" height="200" alt="">
+    <p>{{ post.photo_name }}</p>
+    <p>{{ post.photo_caption}}</p>
+    <p>{{ post.posted_at|timesince }} ago </p>
+    <div>
+        <p>COMMENTS:</p>
+        {% for comment in post.saved_comments %}
 
+        <p> <span><strong>{{comment.user}}</strong></span>: {{comment.comment}}</p>
 
-<div class="card" style="width: 18rem;">
-    <img class="card-img-top" src="..." alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+        {% endfor %}
     </div>
-  </div>
 
-  <br>
-  <br>
+    <form action="{% url 'comments' post_id=post.id%}" class="comment-form com" method="post"
+        enctype="multipart/form-data" style="width: 50%; margin-left: 17%;">
+        {% csrf_token%}
+        {% bootstrap_form form %}
+        <div class="form-group text-center">
+            <input type="submit" class="btn btn-primary login-btn" value="Comment">
+        </div>
+        <input type="hidden" name="next" value="{{next}}">
+    </form>
 
-  <div class="card" style="width: 18rem;">
-    <img class="card-img-top" src="..." alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+    {% endfor %}
+
+    <a href="{%url 'add_post' %}" class="btn btn-outline-dark bg-dark text-white rounded-pill">Add Post</a>
+
+    <div class="col-md-4">
+        <h1>Suggestions For You</h1>
+
+        <h3>{% for user in users %}
+            <p>
+                <img src="{{user.profile_photo.url}}" class="images4" alt="{{pic.photo_name}}"
+                    style="border-radius: 50%; width: 10%;">
+                {{ user.user.username }}
+            </p>
+            {% endfor %}
+        </h3>
+
     </div>
-  </div>
+
+</div>
+
+
 {% endblock %}
