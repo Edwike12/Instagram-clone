@@ -31,24 +31,21 @@ class Post(models.Model):
     posted_at = models.DateTimeField(auto_now_add=True)
     photo_caption = models.TextField()
     user = models.ForeignKey(User,on_delete = models.CASCADE)
-    likes = models.ManyToManyField(User, related_name='post_like')
-
-    def number_of_likes(self):
-        return self.likes.count()
+    liked= models.ManyToManyField(User,default=None,blank=True,related_name='liked')
 
     def save_post(self):
         self.save()
 
 
     @classmethod
-    def display_photos(cls):
-      photos = cls.objects.all().order_by('-posted_at')
-      return photos
+    def display_posts(cls):
+      posts = cls.objects.all().order_by('-posted_at')
+      return posts
     
     
     @property
     def saved_likes(self):
-      return self.photolikes.count()
+      return self.postlikes.count()
     
     @classmethod
     def search_by_photo_name(cls,search_term):
@@ -79,7 +76,19 @@ class Comment(models.Model):
     @classmethod
     def display_comment(cls,post_id):
         comments = cls.objects.filter(post_id = post_id)
-        return comments        
+        return comments   
+
+LIKE_CHOICES={
+    ('Like','Like'),
+    ('Unlike','Unlike',)
+}
+class Like(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    value = models.CharField(choices=LIKE_CHOICES,default='like',max_length=10)
+
+    def str(self):
+        return self.value             
 
 
 
