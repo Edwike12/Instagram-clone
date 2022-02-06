@@ -31,7 +31,10 @@ class Post(models.Model):
     posted_at = models.DateTimeField(auto_now_add=True)
     photo_caption = models.TextField()
     user = models.ForeignKey(User,on_delete = models.CASCADE)
-    liked= models.ManyToManyField(User,default=None,blank=True,related_name='liked')
+    likes = models.ManyToManyField(User, related_name='post_like')
+
+    def number_of_likes(self):
+        return self.likes.count()
 
     def save_post(self):
         self.save()
@@ -58,9 +61,15 @@ class Post(models.Model):
     @property
     def saved_comments(self):
         return self.comments.all()
+
+    @classmethod
+    def search_by_username(cls,search_term):
+        myinsta = cls.objects.filter(username__icontains=search_term)
+        return myinsta    
     
     def __str__(self):
      return "%s photo" % self.photo_name 
+     
 
 class Comment(models.Model):
     comment = models.CharField(max_length=250,null=True)
