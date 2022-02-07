@@ -5,26 +5,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 # Create your models here.
-class Profile(models.Model):
-    profile_photo=CloudinaryField('image')
-    name=models.TextField(max_length=50)
-    user=models.OneToOneField(User,on_delete=models.CASCADE)
-    bio=models.TextField(null=True, max_length=1000)
-    email=models.CharField(null=True, max_length=50)
-    phone_number=models.IntegerField(null=True)
-
-    @receiver(post_save , sender = User)
-    def create_profile(instance,sender,created,**kwargs):
-      if created:
-        Profile.objects.create(user = instance)
-
-    @receiver(post_save,sender = User)
-    def save_profile(sender,instance,**kwargs):
-      instance.profile.save()
-
-      def __str__(self):
-        return f'{self.user.username} profile'
-
 class Post(models.Model):
     image = CloudinaryField('image')
     photo_name = models.CharField(max_length=60)
@@ -66,6 +46,36 @@ class Post(models.Model):
     
     def __str__(self):
      return "%s photo" % self.photo_name 
+
+class Like(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+
+    def str(self):
+        return self.value 
+
+class Profile(models.Model):
+    profile_photo=CloudinaryField('image')
+    name=models.TextField(max_length=50)
+    user=models.OneToOneField(User,on_delete=models.CASCADE, related_name='profile')
+    bio=models.TextField(null=True, max_length=1000)
+    email=models.CharField(null=True, max_length=50)
+    phone_number=models.IntegerField(null=True)
+    likes = models.ForeignKey(Like, on_delete=models.SET_NULL, null=True, related_name='likes', blank=True)
+
+    @receiver(post_save , sender = User)
+    def create_profile(instance,sender,created,**kwargs):
+      if created:
+        Profile.objects.create(user = instance)
+
+    @receiver(post_save,sender = User)
+    def save_profile(sender,instance,**kwargs):
+      instance.profile.save()
+
+      def __str__(self):
+        return f'{self.user.username} profile'
+
+
      
 
 class Comment(models.Model):
@@ -78,17 +88,25 @@ class Comment(models.Model):
         comments = cls.objects.filter(post_id = post_id)
         return comments   
 
-LIKE_CHOICES={
-    ('Like','Like'),
-    ('Unlike','Unlike',)
-}
-class Like(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
-    value = models.CharField(choices=LIKE_CHOICES,default='like',max_length=10)
+# LIKE_CHOICES={
+#     ('Like','Like'),
+#     ('Unlike','Unlike',)
+# }
+# class Like(models.Model):
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+#     value = models.CharField(choices=LIKE_CHOICES,default='like',max_length=10)
 
-    def str(self):
-        return self.value             
+#     def str(self):
+#         return self.value 
+
+# class Follow(models.Model):
+#     follower=models.ForeignKey(User,related_name='followers',on_delete=models.CASCADE)
+#     followed=models.ForeignKey(User,related_name='followed',on_delete=models.CASCADE)
+
+#     def __str__(self):
+#         return self.follower        
+
 
 
 

@@ -44,7 +44,8 @@ def update_profile(request,id):
     return render(request, 'update_profile.html', {"form":form})
 
 @login_required(login_url='/accounts/login/')
-def add_post(request): 
+def add_post(request,id): 
+    user = User.objects.get(id=id)
     current_user = request.user
     if request.method == 'POST':
         post_form = PostForm(request.POST, request.FILES)
@@ -55,7 +56,7 @@ def add_post(request):
         return HttpResponseRedirect('/')
     else:
         post_form = PostForm()  
-    return render(request,'add_post.html', {'post_form':post_form})    
+    return render(request,'add_post.html', {'post_form':post_form, 'user':user})    
 
 @login_required
 def comments(request,post_id):
@@ -85,22 +86,48 @@ def search(request):
         return render(request, 'search.html',{"message1":message})
   
 
-def like_post(request):
-    user = request.user
-    if request.method == 'POST':
-        post_id = request.POST.get('post_id')
-        post_photo =Post.objects.get(id=post_id)
-        if user in post_photo.liked.all():
-            post_photo.liked.add(user)
-        else:
-            post_photo.liked.add(user)    
+# def like_post(request):
+#     user = request.user
+#     if request.method == 'POST':
+#         post_id = request.POST.get('post_id')
+#         post_photo =Post.objects.get(id=post_id)
+#         if user in post_photo.liked.all():
+#             post_photo.liked.add(user)
+#         else:
+#             post_photo.liked.add(user)    
             
-        like,created =Like.objects.get_or_create(user=user, post_id=post_id)
-        if not created:
-            if like.value =='Like':
-               like.value = 'Unlike'
-        else:
-               like.value = 'Like'
+#         like,created =Like.objects.get_or_create(user=user, post_id=post_id)
+#         if not created:
+#             if like.value =='Like':
+#                like.value = 'Unlike'
+#         else:
+#                like.value = 'Like'
 
-        like.save()       
-    return redirect('index')
+#         like.save()       
+#     return redirect('index')
+
+# @login_required(login_url='login')
+# def follow(request, user_id):
+#     user = request.user
+#     other_user = User.objects.get(pk=user_id)
+#     follow = Follow.objects.filter(follower=user, followed=other_user)
+#     if follow:
+#         follow.delete()
+#     else:
+#         new_follow = Follow(follower=user, followed=other_user)
+#         new_follow.save()
+
+#     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def like(request, id):
+    like = get_object_or_404(Like, id=id)
+    request.user.profile.liked = like
+    request.user.profile.save()
+    return redirect('/')
+
+def unlike(request, id):
+    unlike = get_object_or_404(Like, id=id)
+    request.user.profile.liked = None
+    request.user.profile.save()
+    return redirect('/')
+        
