@@ -7,7 +7,7 @@ EDWIKE NYAUNCHO
 
 
 ## Project description
-Perfect-Pxels is a photo gallery web application to showcase beautiful pictures. Users get can view photos uploaded by admin. Users can see photos based on the location, by clicking on the listed locations in the menu. They can also copy the link to a photo to paste at their discretion. They can also search for photos based on the categories.
+This is a website created to clone popular photo app Instagram.
 
 
 ## USER STORY
